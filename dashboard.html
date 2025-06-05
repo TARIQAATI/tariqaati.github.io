@@ -11,7 +11,7 @@
       direction: rtl;
       margin: 0;
     }
-    /* زر تسجيل الخروج */
+
     #logoutBtn {
       position: fixed;
       top: 15px;
@@ -27,23 +27,32 @@
       z-index: 1000;
       transition: background-color 0.3s ease;
     }
+
     #logoutBtn:hover {
       background-color: #a71d2a;
     }
+
     form {
       background: white;
       padding: 25px 30px;
       border-radius: 10px;
       max-width: 900px;
-      margin: 60px auto 20px auto; /* زيادة الهامش العلوي ليظهر الزر */
+      margin: 60px auto 20px auto;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
     label {
       display: block;
       margin-top: 18px;
       font-weight: 600;
       font-size: 1.1em;
     }
+
     input[type="text"],
     input[type="number"],
     textarea,
@@ -57,9 +66,11 @@
       font-family: inherit;
       box-sizing: border-box;
     }
+
     textarea {
       resize: vertical;
     }
+
     button[type="submit"] {
       margin-top: 30px;
       padding: 12px 28px;
@@ -72,11 +83,20 @@
       cursor: pointer;
       transition: background-color 0.3s ease;
     }
+
     button[type="submit"]:hover {
       background: #0056b3;
     }
+
     .hidden {
       display: none;
+    }
+
+    #formStatus {
+      color: green;
+      font-weight: bold;
+      margin-top: 20px;
+      text-align: center;
     }
   </style>
 </head>
@@ -85,9 +105,9 @@
   <button id="logoutBtn" onclick="logout()">تسجيل خروج</button>
 
   <form id="archiveForm" novalidate>
-    <h2 style="text-align:center; margin-bottom:25px;">نموذج إحصائيات الوثائق</h2>
+    <h2>نموذج إحصائيات الوثائق</h2>
 
-    <!-- بيانات التعريف -->
+    <!-- بيانات أساسية -->
     <label for="departmentName">اسم القسم / الإدارة:</label>
     <input type="text" id="departmentName" name="departmentName" required placeholder="ادخل اسم القسم أو الإدارة" />
 
@@ -97,7 +117,7 @@
     <label for="dataEntryName">اسم مدخل البيانات:</label>
     <input type="text" id="dataEntryName" name="dataEntryName" required placeholder="ادخل اسم مدخل البيانات" />
 
-    <!-- أسئلة بنعم / لا -->
+    <!-- أسئلة بنعم/لا -->
     <label for="center">هل يوجد مركز/إدارة وثائق؟</label>
     <select id="center" name="center" required>
       <option value="">-- اختر --</option>
@@ -133,10 +153,10 @@
       <option>لا</option>
     </select>
 
-    <!-- ملاحظات وأعداد -->
     <label>ملاحظات:</label>
     <textarea name="notes" placeholder="أدخل أي ملاحظات إن وجدت..."></textarea>
 
+    <!-- أعداد -->
     <label>عدد الشنط الحديدية:</label>
     <input type="number" name="metalBags" min="0" />
 
@@ -158,7 +178,7 @@
     <label>أخرى (إن وجد):</label>
     <input type="text" name="otherItems" />
 
-    <!-- الحالات الفنية -->
+    <!-- حالات فنية -->
     <label for="documentsCondition">الحالة الفنية للوثائق:</label>
     <select id="documentsCondition" name="documentsCondition" class="condition-select" data-related="documentsNotes" required>
       <option value="">-- اختر --</option>
@@ -223,7 +243,7 @@
     <label id="label-mediaNotes" class="hidden">ملاحظات:</label>
     <textarea id="mediaNotes" name="mediaNotes" class="hidden"></textarea>
 
-    <!-- برامج الأرشفة -->
+    <!-- الأرشفة -->
     <label for="hasArchivingSystem">هل يوجد برنامج أرشفة إلكترونية؟</label>
     <select id="hasArchivingSystem" name="hasArchivingSystem" required>
       <option value="">-- اختر --</option>
@@ -238,7 +258,7 @@
       <option>لا</option>
     </select>
 
-    <!-- الأرقام التقديرية -->
+    <!-- أرقام تقديرية -->
     <label for="paperTransactions">عدد المعاملات الورقية (تقريبي):</label>
     <input type="number" id="paperTransactions" name="paperTransactions" required min="0" />
 
@@ -252,11 +272,25 @@
     <input type="number" id="paperDocsToArchive" name="paperDocsToArchive" required min="0" />
 
     <button type="submit">إرسال النموذج</button>
-    <div id="formStatus" style="color: green; font-weight: bold; margin-top: 20px;"></div>
+    <div id="formStatus"></div>
   </form>
 
-  <!-- جافاسكربت -->
   <script>
+    // التحقق من الدخول
+    document.addEventListener("DOMContentLoaded", () => {
+      const isLoggedIn = localStorage.getItem("loggedIn");
+      if (!isLoggedIn) {
+        window.location.href = "login.html";
+      }
+    });
+
+    // تسجيل الخروج
+    function logout() {
+      localStorage.removeItem("loggedIn");
+      window.location.href = "login.html";
+    }
+
+    // عرض أو إخفاء حقل الملاحظات حسب القيمة
     document.querySelectorAll('.condition-select').forEach(select => {
       select.addEventListener('change', e => {
         const relatedId = e.target.dataset.related;
@@ -274,22 +308,11 @@
       });
     });
 
-    // تسجيل خروج (توجيه مثلاً لصفحة تسجيل الدخول أو مسح الجلسة)
-    function logout() {
-      // إذا كنت تستخدم جلسة تخزين، مسحها هنا
-      alert('تم تسجيل الخروج');
-      // مثال توجيه لصفحة تسجيل الدخول:
-      // window.location.href = 'login.html';
-    }
-
-    // مثال على التحقق من النموذج وإرساله (يمكن تعديل حسب المتطلبات)
+    // إرسال النموذج
     document.getElementById('archiveForm').addEventListener('submit', function(e) {
       e.preventDefault();
-      // التحقق من صحة البيانات هنا
-      // إرسال البيانات عبر AJAX أو أي طريقة أخرى
       document.getElementById('formStatus').textContent = 'تم إرسال النموذج بنجاح.';
       this.reset();
-      // إخفاء حقول الملاحظات بعد إعادة التعيين
       document.querySelectorAll('.condition-select').forEach(select => {
         const relatedId = select.dataset.related;
         document.getElementById(relatedId).classList.add('hidden');
