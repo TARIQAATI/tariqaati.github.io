@@ -280,14 +280,14 @@
     document.addEventListener("DOMContentLoaded", () => {
       const isLoggedIn = localStorage.getItem("loggedIn");
       if (!isLoggedIn) {
-        window.location.href = "dashboard.html";
+window.location.href = 'dashboard.html';
       }
     });
 
     // تسجيل الخروج
     function logout() {
       localStorage.removeItem("loggedIn");
-      window.location.href = "index.html";
+window.location.href = 'dashboard.html';
     }
 
     // عرض أو إخفاء حقل الملاحظات حسب القيمة
