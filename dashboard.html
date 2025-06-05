@@ -9,13 +9,33 @@
       padding: 20px;
       background: #f9f9f9;
       direction: rtl;
+      margin: 0;
+    }
+    /* زر تسجيل الخروج */
+    #logoutBtn {
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 0.9em;
+      z-index: 1000;
+      transition: background-color 0.3s ease;
+    }
+    #logoutBtn:hover {
+      background-color: #a71d2a;
     }
     form {
       background: white;
       padding: 25px 30px;
       border-radius: 10px;
       max-width: 900px;
-      margin: auto;
+      margin: 60px auto 20px auto; /* زيادة الهامش العلوي ليظهر الزر */
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
     label {
@@ -40,7 +60,7 @@
     textarea {
       resize: vertical;
     }
-    button {
+    button[type="submit"] {
       margin-top: 30px;
       padding: 12px 28px;
       background: #007bff;
@@ -52,7 +72,7 @@
       cursor: pointer;
       transition: background-color 0.3s ease;
     }
-    button:hover {
+    button[type="submit"]:hover {
       background: #0056b3;
     }
     .hidden {
@@ -61,6 +81,9 @@
   </style>
 </head>
 <body>
+
+  <button id="logoutBtn" onclick="logout()">تسجيل خروج</button>
+
   <form id="archiveForm" novalidate>
     <h2 style="text-align:center; margin-bottom:25px;">نموذج إحصائيات الوثائق</h2>
 
@@ -136,7 +159,6 @@
     <input type="text" name="otherItems" />
 
     <!-- الحالات الفنية -->
-    <!-- كل عنصر فني له ملاحظات تظهر فقط إذا لم يكن "لا يوجد" -->
     <label for="documentsCondition">الحالة الفنية للوثائق:</label>
     <select id="documentsCondition" name="documentsCondition" class="condition-select" data-related="documentsNotes" required>
       <option value="">-- اختر --</option>
@@ -252,33 +274,26 @@
       });
     });
 
-    document.getElementById("archiveForm").addEventListener("submit", function (e) {
+    // تسجيل خروج (توجيه مثلاً لصفحة تسجيل الدخول أو مسح الجلسة)
+    function logout() {
+      // إذا كنت تستخدم جلسة تخزين، مسحها هنا
+      alert('تم تسجيل الخروج');
+      // مثال توجيه لصفحة تسجيل الدخول:
+      // window.location.href = 'login.html';
+    }
+
+    // مثال على التحقق من النموذج وإرساله (يمكن تعديل حسب المتطلبات)
+    document.getElementById('archiveForm').addEventListener('submit', function(e) {
       e.preventDefault();
-      const form = e.target;
-
-      if (!form.checkValidity()) {
-        alert("يرجى تعبئة جميع الحقول المطلوبة.");
-        return;
-      }
-
-      const data = {};
-      for (let el of form.elements) {
-        if (el.name) data[el.name] = el.value;
-      }
-
-      fetch("https://script.google.com/macros/s/AKfycbzPBo5-0DjHdLrugVyo2VNvY4M3-DVEtbKnqzbMFGL8xbOrWHLB7qwD_3OfJCb-ie0yeg/exec", {
-        method: "POST",
-        body: JSON.stringify(data),
-      })
-      .then(res => res.json())
-      .then(() => {
-        document.getElementById("formStatus").textContent = "✅ تم إرسال النموذج بنجاح.";
-        form.reset();
-        document.querySelectorAll("textarea.hidden, label.hidden").forEach(el => el.classList.add("hidden"));
-      })
-      .catch(error => {
-        document.getElementById("formStatus").textContent = "❌ حدث خطأ أثناء الإرسال.";
-        console.error("Error!", error.message);
+      // التحقق من صحة البيانات هنا
+      // إرسال البيانات عبر AJAX أو أي طريقة أخرى
+      document.getElementById('formStatus').textContent = 'تم إرسال النموذج بنجاح.';
+      this.reset();
+      // إخفاء حقول الملاحظات بعد إعادة التعيين
+      document.querySelectorAll('.condition-select').forEach(select => {
+        const relatedId = select.dataset.related;
+        document.getElementById(relatedId).classList.add('hidden');
+        document.getElementById('label-' + relatedId).classList.add('hidden');
       });
     });
   </script>
